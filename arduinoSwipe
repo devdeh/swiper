@@ -1,0 +1,88 @@
+#include <VarSpeedServo.h>
+VarSpeedServo servo1, servo2;
+
+int pos = 0;
+
+
+const int buttonright = 2;
+const int buttonleft = 4;
+const int sensorPin = A0;
+int sensorValue = 0;
+int buttonstate1 = 0;
+int buttonstate2 = 0;
+
+int fast = 180;
+int slow = 100;
+int lft = 40; 
+int rgt = 150;
+int tapdown = 110;
+int tapup = 180;
+
+
+void setup() {
+  pinMode(buttonright, INPUT);
+  pinMode(buttonleft, INPUT);
+  servo1.attach(9);
+  servo2.attach(10);
+  
+}
+
+void loop() {
+control();
+}
+
+void control(){
+  buttonstate1 = digitalRead(buttonright);
+  buttonstate2 = digitalRead(buttonleft);
+
+  //Swipe right
+  if (buttonstate1 == 1){
+
+      //initpos
+      servo1.write(lft, fast);
+      servo2.write(tapup, fast);
+      servo1.wait();
+      servo2.wait();
+      delay(100);
+  
+      //tapdown
+      servo2.write(tapdown, fast);
+      servo1.wait();
+      delay(15);
+          
+      //Swipe
+      servo1.write(rgt, slow);
+      servo1.wait();
+      
+      //tapup
+      servo2.write(tapup, fast);
+      servo2.wait();
+      delay(15);
+      }
+
+  if (buttonstate2 == 1){
+
+    //initpos
+    servo1.write(rgt, fast);
+    servo2.write(tapup, fast);
+    servo1.wait();
+    servo2.wait();
+    delay(100);
+
+    //tapdown
+    servo2.write(tapdown, fast);
+    servo1.wait();
+    delay(15);
+    delay(100);
+
+    servo1.write(lft, slow);
+    servo1.wait();
+      
+    //tapup
+    servo2.write(tapup, fast);
+    servo2.wait();
+    delay(15);
+    
+    }
+  
+}
