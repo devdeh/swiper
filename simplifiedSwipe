@@ -1,0 +1,107 @@
+import RPi.GPIO as g
+import time
+
+#SETUP#
+g.setmode(g.BOARD)
+g.setup(32, g.OUT)
+g.setup(33, g.OUT)
+g.setwarnings(False)
+servotap = g.PWM(32, 50)
+servoswipe = g.PWM(33, 50)
+
+rgt = 100
+lft = 60
+tapdown = 110
+tapup = 160
+tapup2 = 60
+sleep_short = 0.1
+sleep_long = 0.3
+swipe_sleep = 0.008
+
+servotap.start(0)
+servoswipe.start(0)
+
+def degree(deg):
+    pwm = 2+(deg/18)
+    if pwm > 2 and pwm < 13: # Range in PWM must be between 0 - 12
+        return pwm # Returns correct PWM for degree pos
+    else:
+        print(f"{deg} Not a valid angle: {pwm}")
+    return 0
+
+def initlft():
+    servoswipe.ChangeDutyCycle(degree(lft))
+    time.sleep(sleep_long)
+    servotap.ChangeDutyCycle(degree(tapup))
+    time.sleep(sleep_long)
+
+def initrgt():
+    servoswipe.ChangeDutyCycle(degree(rgt))
+    time.sleep(sleep_long)
+    servotap.ChangeDutyCycle(degree(tapup))
+    time.sleep(sleep_long)   
+
+def swipeToright():
+    i= lft
+    while i < rgt:
+        servoswipe.ChangeDutyCycle(degree(i))
+        i += 2
+        time.sleep(swipe_sleep)    
+
+def swipteToleft():
+    i= rgt
+    while i > lft:
+        servoswipe.ChangeDutyCycle(degree(i))
+        i -= 2
+        time.sleep(swipe_sleep)
+        
+def tap_down():
+    servotap.ChangeDutyCycle(degree(tapdown))
+    time.sleep(sleep_short)
+    servotap.ChangeDutyCycle(0)
+
+def tap_uprgt():
+    servotap.ChangeDutyCycle(degree(tapup))
+    time.sleep(sleep_short) 
+
+def tap_uplft():
+    servotap.ChangeDutyCycle(degree(tapup2))
+    time.sleep(sleep_short) 
+
+def stop():
+    servotap.ChangeDutyCycle(0)
+    servoswipe.ChangeDutyCycle(0)
+
+def swipe_right():
+    initrgt()
+    tap_down()
+    swipeToright()
+    tap_uprgt()
+    stop()
+
+def swipe_left(): #down
+    initlft()
+    tap_down()
+    swipteToleft()
+    tap_uplft()
+    stop()
+
+def main():
+    
+    while True:
+        use = input("Do you want to go left 'l', right 'r', tap down 'd' or tap up 'u'? ")
+        if use == "l":
+            swipe_left()
+        elif use == "r":
+            swipe_right()
+        elif use == "d":
+            tap_down()
+        elif use == "u":
+            tap_uprgt()
+        else:
+            servotap.stop()
+            servoswipe.stop()
+            g.cleanup()
+            break
+
+main()
