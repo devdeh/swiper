@@ -1,0 +1,21 @@
+import time
+import serial
+strComPort = '/dev/ttyACM0'
+strComBaud = 9600
+
+cmdSerial = serial.Serial(strComPort, strComBaud)
+time.sleep(2) #sec
+
+while True:
+    var = input("Enter swipe command 1 to swipe right 0 to swipe left")
+
+    if (var == "1" or var  =="0"):
+        cmdSerial.write(var.encode())
+        time.sleep(1)
+
+    elif (var == 'q'):
+        print("Exiting...")
+        break
+
+    else:
+        print("Only '0' (right), '1' (left), or 'q' (exit)")
