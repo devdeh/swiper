@@ -1,0 +1,81 @@
+#include <VarSpeedServo.h>
+VarSpeedServo servoswipe, servotap;
+
+int data = 0;
+
+
+const int buttonright = 2;
+const int buttonleft = 4;
+int buttonstate1 = 0;
+int buttonstate2 = 0;
+
+int fast = 180;
+int slow = 100;
+int lft = 95; 
+int rgt = 175;
+int tapdown = 110;
+int tapup = 180;
+
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(buttonright, INPUT);
+  pinMode(buttonleft, INPUT);
+  servoswipe.attach(9);
+  servotap.attach(10);
+  
+}
+
+void loop() {
+  while (Serial.available()) {
+    data = Serial.read();
+
+    if (data == '1' ) {
+
+      //initpos
+      servoswipe.write(lft, fast);
+      servotap.write(tapup, fast);
+      servoswipe.wait();
+      servotap.wait();
+      delay(100);
+  
+      //tapdown
+      servotap.write(tapdown, fast);
+      servotap.wait();
+      delay(15);
+          
+      //Swipe
+      servoswipe.write(rgt, slow);
+      servoswipe.wait();
+      
+      //tapup
+      servotap.write(tapup, fast);
+      servotap.wait();
+      delay(15);}
+
+     else if (data == '0') {
+
+     //initpos
+    servoswipe.write(rgt, fast);
+    servotap.write(tapup, fast);
+    servoswipe.wait();
+    servotap.wait();
+    delay(100);
+
+    //tapdown
+    servotap.write(tapdown, fast);
+    servotap.wait();
+    delay(15);
+    delay(100);
+
+    servoswipe.write(lft, slow);
+    servoswipe.wait();
+      
+    //tapup
+    servotap.write(tapup, fast);
+    servotap.wait();
+    delay(15);
+     }
+      
+    }
+  }
